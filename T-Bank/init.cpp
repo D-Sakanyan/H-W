@@ -9,6 +9,11 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
+    if (argc != 2) {
+        std::cerr << "Wrond arg number" << std::endl;
+        return 1;
+    }
+
     const int N = atoi(argv[1]);
     int fd = shm_open("/bank", O_CREAT | O_RDWR, 0666);
     if (fd == -1) {
@@ -31,19 +36,16 @@ int main(int argc, char* argv[]) {
     close(fd);
 
     TBank* bank = new(ptr) TBank;
-    Cell* cells = reinterpret_cast<Cell*>(reinterpret_cast<char*>(bank) + sizeof(TBank));
     bank->size = N;
-
-for(int i = 0; i<N; i++){
-    cells[i].cur_b = 0;
-    cells[i].min = 0;
-    cells[i].max = 500;
-    cells[i].frozen = false;
-}
+    for(int i = 0; i<N; i++){
+        bank->cells[i].cur_b = 0;
+        bank->cells[i].min = 0;
+        bank->cells[i].max = 500;
+        bank->cells[i].frozen = false;
+    }
     munmap(ptr, total_size);
 
 
 // shm_unlink("/bank"); // удалить разделяемую память, если больше не нужна
     return 0;
 }
-
