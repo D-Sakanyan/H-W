@@ -12,46 +12,49 @@
 using namespace std;
 
 int main(){
-	const char* shm_name =  "/bank";
-	size_t size = 4096;
+        const char* shm_name =  "/bank";
 
-	int fd = shm_open(shm_name, O_RDWR, 0666);
-	if(fd == -1){
-		perror("shm_open");
-		exit(-1);
-	}
+        int fd = shm_open(shm_name, O_RDWR, 0666);
+        if(fd == -1){
+                perror("shm_open");
+                exit(-1);
+        }
 
-	void* ptr = mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-	if(ptr == MAP_FAILED){
-		perror("mmap");
-		exit(1);
-	}
+        struct stat statbuf;
+        fstat(fd, &statbuf);
 
-	TBank* bank = reinterpret_cast<TBank*>(ptr);
-	Cell* cell = reinterpret_cast<Cell*>((char*)ptr + sizeof(TBank));
+        size_t size = statbuf.st_size;
 
-	string line;
-	//std::cout<<"command";
-	while(getline(std::cin,line)){
-		stringstream ss(line);
-		string cmd;
-		ss >> cmd;
+        void* ptr = mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+        if(ptr == MAP_FAILED){
+                perror("mmap");
+                exit(1);
+        }
 
-	if(cmd == "get_balance"){
-		int acc_num;
-		ss >> acc_num;
+        TBank* bank = static_cast<TBank*>(ptr);
 
-	if(acc_num < 0 || acc_num >= bank->size){
-		std::cout<<"wrong num of account";
-		continue;
-	}
-	std::cout<<"num "<<acc_num<<" "<<bank->cells[acc_num].cur_b;
-	}else{
- 		std::cout<<"unknown";
-	}
-	}
-	munmap(ptr,size);
-	close(fd);
-	return 0;
+        string line;
+        //std::cout<<"command";
+        while(getline(std::cin,line)){
+                stringstream ss(line);
+                string cmd;
+                ss >> cmd;
+
+        if(cmd == "get_balance"){
+                int acc_num;
+                ss >> acc_num;
+
+        if(acc_num < 0 || acc_num >= bank->size){
+                std::cout<<"wrong num of account";
+                continue;
+        }
+std::cout<< "<<acc_num<<" "<<bank->cells[acc_num].cur_b;
+        }else{
+                std::cout<<"unknown";
+        }
+        }
+        munmap(ptr,size);
+        close(fd);
+        return 0;
 
 }
