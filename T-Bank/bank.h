@@ -1,45 +1,27 @@
-#include <iostream>
+#ifndef BANK_H
+#define BANK_H
 
+#include <cstddef>
 class Cell {
 public:
     int cur_b;
     int min;
     int max;
-    bool frozen;
+    int is_frozen;
 };
 
 class TBank {
 public:
-/*
-    void transferAcc(){
-
-    }
-
-    void enrollment(){
-
-    }
-
-    void write_off(){
-
-    }s
-
-    void froze(){
-
-    }
-
-    void unfroze(){
-
-    }
-
-    void limits {
-
-    }
-*/
-void functions(){
-std::cout<<"function";
-}
-
     size_t size;
-    Cell cells[]; // flexible array member
+    Cell cells[];
 };
 
+int get_balance_curr(TBank* bank, int acc_num);
+int get_balance_min(TBank* bank, int acc_num);
+int get_balance_max(TBank* bank, int acc_num);
+int froze(TBank* bank, int acc_num);
+int unfroze(TBank* bank, int acc_num);
+int transfer(TBank* bank, int from_acc, int to_acc, int amount);
+int add(TBank* bank, int amount);
+int withdraw(TBank* bank, int amount);
+#endif
